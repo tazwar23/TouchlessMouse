@@ -7,11 +7,17 @@ import time
 drawing_utils = mp.solutions.drawing_utils
 hands_module = mp.solutions.hands
 
-# Parameters
-ACTION_COOLDOWN = 2  # seconds
+#Gobal variable for mouse drag state
+is_holding = False
+
+# Parameters to send to detect_gesture function
+#Configue the time interval between each record button
+ACTION_COOLDOWN = 2 
+#Holds the last time a button was clicked 
 last_action_time = time.time()
 
 capture = cv2.VideoCapture(0)
+
 
 if capture.isOpened(): 
     width  = capture.get(cv2.CAP_PROP_FRAME_WIDTH)   # float `width`
@@ -24,6 +30,7 @@ def calculate_distance(landmark1, landmark2):
 
 
 def detect_gestures(landmarks):
+    global is_holding
     # Compute required landmarks once
     #Index Finger
     index_tip = landmarks.landmark[hands_module.HandLandmark.INDEX_FINGER_TIP]
@@ -37,11 +44,13 @@ def detect_gestures(landmarks):
     middle_base = landmarks.landmark[hands_module.HandLandmark.MIDDLE_FINGER_MCP]
     #Ringer Finger
     ring_tip = landmarks.landmark[hands_module.HandLandmark.RING_FINGER_TIP]
+    ring_pip = landmarks.landmark[hands_module.HandLandmark.RING_FINGER_PIP]
     #Pinky
     pinky_tip = landmarks.landmark[hands_module.HandLandmark.PINKY_TIP]
+    pinky_pip = landmarks.landmark[hands_module.HandLandmark.PINKY_DIP]
     #Thumb
     thumb_tip = landmarks.landmark[hands_module.HandLandmark.THUMB_TIP]
-    thumb_dip = landmarks.landmark[hands_module.HandLandmark.THUMB_DIP]
+    thumb_dip = landmarks.landmark[hands_module.HandLandmark.THUMB_IP]
 
     
     
@@ -54,26 +63,33 @@ def detect_gestures(landmarks):
 
     # Mouse movement
      # Calculate distances between tip and fingertip landmarks
-    thumb_tip_dip_distance = calculate_distance(thumb_tip, thumb_dip)
-    index_tip_pip_distance = calculate_distance(index_tip, index_pip)
-    middle_tip_pip_distance = calculate_distance(middle_tip, landmarks.landmark[hands_module.HandLandmark.MIDDLE_FINGER_PIP])
-    ring_tip_pip_distance = calculate_distance(ring_tip, landmarks.landmark[hands_module.HandLandmark.RING_FINGER_PIP])
-    pinky_tip_pip_distance = calculate_distance(pinky_tip, landmarks.landmark[hands_module.HandLandmark.PINKY_DIP])
+    #thumb_tip_dip_distance = calculate_distance(thumb_tip, thumb_dip)
+    index_tip_pip_distance = calculate_distance(index_tip, thumb_tip)
+    middle_tip_pip_distance = calculate_distance(middle_tip, thumb_tip)
+    ring_tip_pip_distance = calculate_distance(ring_tip, thumb_tip)
+    pinky_tip_pip_distance = calculate_distance(pinky_tip, thumb_tip)
 
     # Define distance thresholds for pinch detection (adjust as needed)
-    pinch_threshold = 0.02
+    pinch_threshold = 0.05
 
      # Check if all fingers are pinched
-    if (
-        thumb_tip_dip_distance < pinch_threshold and
+    if ( 
         index_tip_pip_distance < pinch_threshold and
         middle_tip_pip_distance < pinch_threshold and
         ring_tip_pip_distance < pinch_threshold and
         pinky_tip_pip_distance < pinch_threshold
     ):
-        pyautogui.mouseDown(button='left')
+        if(is_holding == False):
+            print("Left click huwa")
+            pyautogui.mouseDown(button='left')
+            is_holding = True
+            return time.time()
     else:
-        pyautogui.mouseUp(button='left')
+        if(is_holding == True):
+            print("Off")
+            pyautogui.mouseUp(button='left')
+            is_holding = False
+            return time.time()
 
     # Left click
     # Calculate angle between finger and palm using trigonometry
