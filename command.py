@@ -9,6 +9,9 @@ hands_module = mp.solutions.hands
 
 #Gobal variable for mouse drag state
 is_holding = False
+#Global variable for the threshold angle for a bent finger (adjust as needed)
+threshold_angle = 30
+
 
 # Parameters to send to detect_gesture function
 #Configue the time interval between each record button
@@ -18,19 +21,22 @@ last_action_time = time.time()
 
 capture = cv2.VideoCapture(0)
 
-
+#Video input's screen dimentions
 if capture.isOpened(): 
     width  = capture.get(cv2.CAP_PROP_FRAME_WIDTH)   # float `width`
     height = capture.get(cv2.CAP_PROP_FRAME_HEIGHT)  # float `height`
 
+#Devices screen dimentions
 screen_width, screen_height = pyautogui.size()
 
+#calculates the Euclidean distance between two landmarks in a two-dimensional space
 def calculate_distance(landmark1, landmark2):
     return np.sqrt((landmark1.x - landmark2.x)**2 + (landmark1.y - landmark2.y)**2)
 
-
+#Param: Detected hand landmarks from mediapipe, for for info https://developers.google.com/mediapipe/solutions/vision/hand_landmarker#configurations_options
 def detect_gestures(landmarks):
     global is_holding
+    global threshold_angle
     # Compute required landmarks once
     #Index Finger
     index_tip = landmarks.landmark[hands_module.HandLandmark.INDEX_FINGER_TIP]
@@ -52,18 +58,10 @@ def detect_gestures(landmarks):
     thumb_tip = landmarks.landmark[hands_module.HandLandmark.THUMB_TIP]
     thumb_dip = landmarks.landmark[hands_module.HandLandmark.THUMB_IP]
 
-    
-    
-    
-    
-
-    
-
     # Check for gestures
-
-    # Mouse movement
-     # Calculate distances between tip and fingertip landmarks
-    #thumb_tip_dip_distance = calculate_distance(thumb_tip, thumb_dip)
+    
+    ##############    Pinch gesture detection for dragging capabilities
+    # Calculate distances between each finger tip and thumb landmarks
     index_tip_pip_distance = calculate_distance(index_tip, thumb_tip)
     middle_tip_pip_distance = calculate_distance(middle_tip, thumb_tip)
     ring_tip_pip_distance = calculate_distance(ring_tip, thumb_tip)
@@ -79,30 +77,30 @@ def detect_gestures(landmarks):
         ring_tip_pip_distance < pinch_threshold and
         pinky_tip_pip_distance < pinch_threshold
     ):
+        #If not holding the button, hold the button
         if(is_holding == False):
-            print("Left click huwa")
             pyautogui.mouseDown(button='left')
             is_holding = True
             return time.time()
     else:
         if(is_holding == True):
-            print("Off")
             pyautogui.mouseUp(button='left')
             is_holding = False
             return time.time()
 
-    # Left click
+    
+    ################# Index finger bend down gesture detection for left click
     # Calculate angle between finger and palm using trigonometry
     dx = index_tip.x - index_base.x
     dy = index_tip.y - index_base.y
     angle = np.arctan2(dy, dx) * 180 / np.pi
 
-    # Define the threshold angle for a bent finger (adjust as needed)
-    threshold_angle = 30
+    # Check if finger angle exceeds threshold for left-click
     if angle > threshold_angle:
         pyautogui.click(button='left')
         return time.time()
 
+    # Calculate angle between finger and palm using trigonometry
     dx = middle_tip.x - middle_base.x
     dy = middle_tip.y - middle_base.y
     angle = np.arctan2(dy, dx) * 180 / np.pi
@@ -111,7 +109,7 @@ def detect_gestures(landmarks):
     if angle > threshold_angle:
         pyautogui.click(button='right')
         return time.time()
-    pyautogui.moveTo(middle_tip.x*screen_width,middle_tip.y*screen_height)
+    pyautogui.moveTo(middle_base.x*screen_width,middle_base.y*screen_height)
 
     return last_action_time
 
