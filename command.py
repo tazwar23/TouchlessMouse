@@ -129,8 +129,8 @@ with hands_module.Hands(min_detection_confidence=0.8, min_tracking_confidence=0.
                     image=image,
                     landmark_list=landmarks,
                     connections=hands_module.HAND_CONNECTIONS,
-                    landmark_drawing_spec=drawing_utils.DrawingSpec(color=(0, 255, 0), thickness=15),
-                    connection_drawing_spec=drawing_utils.DrawingSpec(color=(255, 255, 0), thickness=10)
+                    landmark_drawing_spec=drawing_utils.DrawingSpec(color=(200, 0, 0), thickness=7),
+                    connection_drawing_spec=drawing_utils.DrawingSpec(color=(255, 255, 255), thickness=7)
                 )
 
                 if time.time() - last_action_time > ACTION_COOLDOWN:
