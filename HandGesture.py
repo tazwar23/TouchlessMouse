@@ -11,6 +11,8 @@ hands_module = mp.solutions.hands
 is_holding = False
 #Global variable for the threshold angle for a bent finger (adjust as needed)
 threshold_angle = 30
+# Define distance thresholds for pinch detection (adjust as needed)
+pinch_threshold = 0.05
 
 
 # Parameters to send to detect_gesture function
@@ -37,38 +39,30 @@ def calculate_distance(landmark1, landmark2):
 def detect_gestures(landmarks):
     global is_holding
     global threshold_angle
+    global pinch_threshold
     # Compute required landmarks once
     #Index Finger
     index_tip = landmarks.landmark[hands_module.HandLandmark.INDEX_FINGER_TIP]
-    index_pip = landmarks.landmark[hands_module.HandLandmark.INDEX_FINGER_PIP]
-    index_dip = landmarks.landmark[hands_module.HandLandmark.INDEX_FINGER_DIP]
     index_base = landmarks.landmark[hands_module.HandLandmark.INDEX_FINGER_MCP]
     #Middle Finger
     middle_tip = landmarks.landmark[hands_module.HandLandmark.MIDDLE_FINGER_TIP]
-    middle_pip = landmarks.landmark[hands_module.HandLandmark.MIDDLE_FINGER_PIP]
-    middle_dip = landmarks.landmark[hands_module.HandLandmark.MIDDLE_FINGER_DIP]
     middle_base = landmarks.landmark[hands_module.HandLandmark.MIDDLE_FINGER_MCP]
     #Ringer Finger
     ring_tip = landmarks.landmark[hands_module.HandLandmark.RING_FINGER_TIP]
-    ring_pip = landmarks.landmark[hands_module.HandLandmark.RING_FINGER_PIP]
     #Pinky
     pinky_tip = landmarks.landmark[hands_module.HandLandmark.PINKY_TIP]
-    pinky_pip = landmarks.landmark[hands_module.HandLandmark.PINKY_DIP]
     #Thumb
     thumb_tip = landmarks.landmark[hands_module.HandLandmark.THUMB_TIP]
-    thumb_dip = landmarks.landmark[hands_module.HandLandmark.THUMB_IP]
 
     # Check for gestures
-    
-    ##############    Pinch gesture detection for dragging capabilities
+
+    ##############    Pinch gesture detection for dragging capabilities ################################
+
     # Calculate distances between each finger tip and thumb landmarks
     index_tip_pip_distance = calculate_distance(index_tip, thumb_tip)
     middle_tip_pip_distance = calculate_distance(middle_tip, thumb_tip)
     ring_tip_pip_distance = calculate_distance(ring_tip, thumb_tip)
     pinky_tip_pip_distance = calculate_distance(pinky_tip, thumb_tip)
-
-    # Define distance thresholds for pinch detection (adjust as needed)
-    pinch_threshold = 0.05
 
      # Check if all fingers are pinched
     if ( 
@@ -89,7 +83,8 @@ def detect_gestures(landmarks):
             return time.time()
 
     
-    ################# Index finger bend down gesture detection for left click
+    ################# Index finger bend down gesture detection for left click #####################
+
     # Calculate angle between finger and palm using trigonometry
     dx = index_tip.x - index_base.x
     dy = index_tip.y - index_base.y
