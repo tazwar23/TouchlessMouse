@@ -8,12 +8,8 @@ Ensure you have Python installed on your machine. You can download and install P
 
 ## Step-by-step guide
 
-1. **Clone the repository:**
+1. **Clone the repository**
 
-    ```bash
-    git clone [URL_OF_YOUR_GIT_REPO]
-    cd [YOUR_REPO_NAME]
-    ```
 
 2. **Set up a virtual environment (Optional, but recommended):**
 
