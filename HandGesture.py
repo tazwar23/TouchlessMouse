@@ -88,6 +88,7 @@ def detect_gestures(landmarks):
     # Calculate angle between finger and palm using trigonometry
     dx = index_tip.x - index_base.x
     dy = index_tip.y - index_base.y
+
     angle = np.arctan2(dy, dx) * 180 / np.pi
 
     # Check if finger angle exceeds threshold for left-click
@@ -98,6 +99,7 @@ def detect_gestures(landmarks):
     # Calculate angle between finger and palm using trigonometry
     dx = middle_tip.x - middle_base.x
     dy = middle_tip.y - middle_base.y
+    
     angle = np.arctan2(dy, dx) * 180 / np.pi
 
     # Check if finger angle exceeds threshold for right-click
