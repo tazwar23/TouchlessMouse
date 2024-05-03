@@ -1,8 +1,8 @@
-# Installation and Run
+# Demo
 
-Follow these steps to get the `HandGesture.py` script up and running.
+Watch the demo video here to see the `HandGesture.py` script in action: [Hand Gesture Recognition Demo](https://youtu.be/zv-mnYcON5c)
 
-## Prerequisites
+## Installation and Prerequisites
 
 Ensure you have Python installed on your machine. You can download and install Python from [here](https://www.python.org/downloads/).
 
